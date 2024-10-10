@@ -1,0 +1,21 @@
+#!/usr/bin/swipl -f -q
+
+/* Prolog code for the riddle */
+
+/* Function to solve the riddle */
+solve_riddle(Man) :-
+    father(john, speaker),    /* speaker's father is John */
+    father(speaker, Man).     /* speaker's son is the man being referred to */
+
+/* Define family relationships */
+parent(john, speaker).
+male(speaker).
+
+/* Father predicate */
+father(X, Y) :-
+    parent(X, Y),
+    male(X).
+
+/* Run the riddle solution */
+:- solve_riddle(Who),
+   writenlist(['The man referred to in the riddle is: ', Who]).
