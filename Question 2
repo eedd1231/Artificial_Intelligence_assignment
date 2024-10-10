@@ -1,0 +1,69 @@
+#!/usr/bin/swipl -f -q
+
+/* Function for work with list - BEGIN */
+writenlist([]) :- nl.
+
+writenlist([H|T]) :-
+    write(H),
+    write(' '),
+    writenlist(T).
+
+reverse_writenllist([]).
+
+reverse_writenllist([H|T]) :-
+    reverse_writenllist(T),
+    write(H),
+    nl.
+
+member(X, [X|_]).
+
+member(X, [_|T]) :-
+    member(X, T).
+
+/* Function for work with list - END */
+
+/* Facts: weight of individuals */
+weight(man, 80).
+weight(woman, 80).
+weight(child1, 30).
+weight(child2, 30).
+
+/* Boat capacity */
+boat_capacity(100).
+
+/* Check if boat is within capacity */
+valid_boat(People) :-
+    boat_capacity(Cap),
+    total_weight(People, TotalWeight),
+    TotalWeight =< Cap.
+
+/* Calculate total weight of list */
+total_weight([], 0).
+total_weight([Person|Rest], TotalWeight) :-
+    weight(Person, W),
+    total_weight(Rest, RestWeight),
+    TotalWeight is W + RestWeight.
+
+/* River crossing state transition */
+cross_river(state([], RightSide, right)) :-
+    write('Everyone has crossed the river: '),
+    writenlist(RightSide).
+
+cross_river(state(LeftSide, RightSide, left)) :-
+    select(P1, LeftSide, L1),
+    (select(P2, L1, L2); L2 = L1),
+    valid_boat([P1, P2]),
+    writenlist(['Moving ', P1, P2, ' from left to right']),
+    cross_river(state(L2, [P1, P2|RightSide], right)).
+
+cross_river(state(LeftSide, RightSide, right)) :-
+    select(P, RightSide, R1),
+    writenlist(['Moving ', P, ' from right to left']),
+    cross_river(state([P|LeftSide], R1, left)).
+
+/* Start the river crossing */
+start :-
+    cross_river(state([man, woman, child1, child2], [], left)).
+
+/* Run the program */
+:- start.
